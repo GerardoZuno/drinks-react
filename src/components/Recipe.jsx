@@ -1,7 +1,10 @@
-import React from 'react'
+import React, {useContext} from 'react'
+import {ModalContext} from '../context/ModalContext'
 
 function Recipe({receta}) {
-    console.log(receta)
+
+     const {setIdReceta} = useContext(ModalContext)
+
     return (
         
       <div className="col-md-4 mb-3">
@@ -14,7 +17,8 @@ function Recipe({receta}) {
               
               <div className="card-body">
                   <button
-                  className="btn btn-block btn-primary">
+                  className="btn btn-block btn-primary"
+                  onClick={() =>setIdReceta(receta.idDrink)}>
                       Receta
                   </button>
               </div>

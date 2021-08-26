@@ -105,6 +105,8 @@ const Receta = ({ receta }) => {
 
               <h3>Ingredientes y cantidades</h3>
               <ul>{mostrarIngredientes(recetaIdDetails)}</ul>
+
+              
             </div>
           </Modal>
         </div>

@@ -1,32 +1,116 @@
-import React, {useContext} from 'react'
-import {ModalContext} from '../context/ModalContext'
+import React, { useContext, useState } from "react";
+import { ModalContext } from "../context/ModalContext";
 
-function Recipe({receta}) {
+import Modal from "@material-ui/core/Modal";
+import { makeStyles } from "@material-ui/core/styles";
 
-     const {setIdReceta} = useContext(ModalContext)
+function getModalStyle() {
+  const top = 50;
+  const left = 50;
 
-    return (
-        
-      <div className="col-md-4 mb-3">
-          <div className="card">
-              <h2 className="card-header">
-                  {receta.strDrink}
-              </h2>
-              
-                  <img src={receta.strDrinkThumb} alt={receta.strDrink} className="card-img-top" />
-              
-              <div className="card-body">
-                  <button
-                  className="btn btn-block btn-primary"
-                  onClick={() =>setIdReceta(receta.idDrink)}>
-                      Receta
-                  </button>
-              </div>
-          </div>
-
-      </div>   
-        
-    )
+  return {
+    top: `${top}%`,
+    left: `${left}%`,
+    transform: `translate(-${top}%, -${left}%)`,
+  };
 }
 
-export default Recipe
+const useStyles = makeStyles((theme) => ({
+  paper: {
+    position: "absolute",
+    width: 450,
+    backgroundColor: theme.palette.background.paper,
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(2, 4, 3),
+  },
+}));
+
+const Receta = ({ receta }) => {
+  // Configuración del modal de material-ui
+  const [modalStyle] = useState(getModalStyle);
+  const [open, setOpen] = useState(false);
+
+  const classes = useStyles();
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  // extraer los valores del context
+  const { setIdReceta, recetaIdDetails, setRecetaIdDetails } =
+    useContext(ModalContext);
+
+  // Muestra y formatea los ingredientes
+  const mostrarIngredientes = (recetaIdDetails) => {
+    let ingredientes = [];
+    for (let i = 1; i < 16; i++) {
+      if (recetaIdDetails[`strIngredient${i}`]) {
+        ingredientes.push(
+          <li>
+            {" "}
+            {recetaIdDetails[`strIngredient${i}`]}{" "}
+            {recetaIdDetails[`strMeasure${i}`]}
+          </li>
+        );
+      }
+    }
+
+    return ingredientes;
+  };
+
+  return (
+    <div className="col-md-4 mb-3">
+      <div className="card">
+        <h2 className="card-header">{receta.strDrink}</h2>
+
+        <img
+          className="card-img-top"
+          src={receta.strDrinkThumb}
+          alt={`Imagen de ${receta.strDrink}`}
+        />
+
+        <div className="card-body">
+          <button
+            type="button"
+            className="btn btn-block btn-primary"
+            onClick={() => {
+              setIdReceta(receta.idDrink);
+              handleOpen();
+            }}
+          >
+            Ver Receta
+          </button>
+
+          <Modal
+            open={open}
+            onClose={() => {
+              setIdReceta(null);
+              setRecetaIdDetails({});
+              handleClose();
+            }}
+          >
+            <div style={modalStyle} className={classes.paper}>
+              <h2>{recetaIdDetails.strDrink}</h2>
+              <h3 className="mt-4">Instrucciones</h3>
+              <p>{recetaIdDetails.strInstructions}</p>
+
+              <img
+                className="img-fluid my-4"
+                src={recetaIdDetails.strDrinkThumb}
+                alt={recetaIdDetails.strDrink}
+              />
+
+              <h3>Ingredientes y cantidades</h3>
+              <ul>{mostrarIngredientes(recetaIdDetails)}</ul>
+            </div>
+          </Modal>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Receta;
